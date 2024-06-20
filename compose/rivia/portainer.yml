@@ -1,0 +1,17 @@
+services:
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - socket_proxy
+    # command: -H unix:///var/run/docker.sock # # Use Docker Socket Proxy instead for improved security
+    command: -H tcp://socket-proxy:2375
+    ports:
+      - 9000:9000
+    volumes:
+      - $DOCKERDIR/appdata/portainer:/data
+    environment:
+      TZ: $TZ
+    restart: unless-stopped

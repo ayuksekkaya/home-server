@@ -1,0 +1,163 @@
+version: '3.3'
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    # container_name: gluetun
+    # line above must be uncommented to allow external containers to connect.
+    # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - .config/gluetun:/gluetun
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+      - 8080:8080                       # <-- Qbittorrent webUI
+      - 6881:6881                       # <-- Qbittorrent port
+      - 6881:6881/udp                   # <-- Qbittorrent port
+      - 7878:7878                       # <-- Radarr port
+      - 8989:8989                       # <-- Sonarr port
+      - 9696:9696                       # <-- Prowlarr port
+      - 6767:6767                       # <-- Bazzar port
+      - 9117:9117                       # <-- Jackett port
+    restart: unless-stopped
+    environment:
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      # - VPN_SERVICE_PROVIDER=ivpn
+      # - VPN_TYPE=openvpn
+      # OpenVPN:
+      # - OPENVPN_USER=
+      # - OPENVPN_PASSWORD=
+      # Wireguard:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=wireguard
+      - VPN_ENDPOINT_IP=146.70.195.34
+      - VPN_ENDPOINT_PORT=51820
+      - WIREGUARD_PRIVATE_KEY=EH0qX1ZGjoSN+XbRK8Jt2Nc/OEkKtq99MoKGlwugOkE=
+      - WIREGUARD_PUBLIC_KEY=pD8KPLHTUnyGvfZxSZn5mgedaIZIr+CV8Ci264WdEWU=
+      - WIREGUARD_ADDRESSES=10.2.0.2/32
+      # Timezone for accurate log times
+      - TZ=Etc/UTC
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - .config/qbittorrent:/config
+      - /data/downloads:/data/downloads
+    restart: unless-stopped
+    depends_on:
+      - gluetun
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - .config/jackett:/config
+      - /data/downloads:/downloads
+    restart: unless-stopped
+    depends_on:
+      - gluetun
+      - qbittorrent
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - .config/prowlarr:/config
+    restart: unless-stopped
+    depends_on:
+      - gluetun
+      - qbittorrent
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - .config/sonarr:/config
+      - /data:/data
+    restart: unless-stopped
+    depends_on:
+      - gluetun
+      - qbittorrent
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - .config/radarr:/config
+      - /data:/data
+    restart: unless-stopped
+    depends_on:
+      - gluetun
+      - qbittorrent
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - .config/bazarr:/config
+      - /data/media:/data/media
+    restart: unless-stopped 
+    depends_on:
+      - gluetun
+      - qbittorrent
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - .config/jellyfin:/config
+      - /data/media:/data/media
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+      - 7359:7359/udp #optional
+      - 1900:1900/udp #optional
+    devices:
+      - '/dev/dri/renderD128:/dev/dri/renderD128'
+      - '/dev/dri/card0:/dev/dri/card0'
+    restart: unless-stopped
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    ports:
+      - 9000:9000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - .config/portainer:/data
+    restart: unless-stopped
+

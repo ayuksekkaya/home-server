@@ -1,0 +1,29 @@
+########################### NETWORKS
+networks:
+  default:
+    driver: bridge
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+
+include:
+  ########################### SERVICES
+  # HOSTNAME=rivia - defined in .env
+  # CORE
+  - compose/$HOSTNAME/socket-proxy.yml
+  - compose/$HOSTNAME/portainer.yml
+  - compose/$HOSTNAME/dozzle.yml
+  - compose/$HOSTNAME/homepage.yml
+  - compose/$HOSTNAME/gluetun.yml
+  - compose/$HOSTNAME/qbittorrent.yml
+  - compose/$HOSTNAME/bazarr.yml
+  - compose/$HOSTNAME/prowlarr.yml
+  - compose/$HOSTNAME/radarr.yml
+  - compose/$HOSTNAME/sonarr.yml
+  - compose/$HOSTNAME/duckdns.yml
+  - compose/$HOSTNAME/wg-easy.yml
+
+

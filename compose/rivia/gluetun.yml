@@ -1,0 +1,42 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    # container_name: gluetun
+    # line above must be uncommented to allow external containers to connect.
+    # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - $DOCKERDIR/appdata/gluetun:/gluetun
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+      - 8080:8080                       # <-- Qbittorrent webUI
+      - 6881:6881                       # <-- Qbittorrent port
+      - 6881:6881/udp                   # <-- Qbittorrent port
+      - 7878:7878                       # <-- Radarr port
+      - 8989:8989                       # <-- Sonarr port
+      - 9696:9696                       # <-- Prowlarr port
+      - 6767:6767                       # <-- Bazzar port
+      - 9117:9117                       # <-- Jackett port
+    restart: unless-stopped
+    environment:
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      # - VPN_SERVICE_PROVIDER=ivpn
+      # - VPN_TYPE=openvpn
+      # OpenVPN:
+      # - OPENVPN_USER=
+      # - OPENVPN_PASSWORD=
+      # Wireguard:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=wireguard
+      - VPN_ENDPOINT_IP=$VPN_ENDPOINT_IP
+      - VPN_ENDPOINT_PORT=51820
+      - WIREGUARD_PRIVATE_KEY=$WIREGUARD_PRIVATE_KEY
+      - WIREGUARD_PUBLIC_KEY=$WIREGUARD_PUBLIC_KEY
+      - WIREGUARD_ADDRESSES=$WIREGUARD_ADDRESSES
+      # Timezone for accurate log times
+      - TZ=$TZ

@@ -1,0 +1,24 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    networks:
+      - default
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+    volumes:
+      - $DOCKERDIR/appdata/jellyfin:/config
+      - /data/media:/data/media
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+      - 7359:7359/udp #optional
+      - 1900:1900/udp #optional
+    devices:
+      - '/dev/dri/renderD128:/dev/dri/renderD128'
+      - '/dev/dri/card0:/dev/dri/card0'
+    restart: unless-stopped
