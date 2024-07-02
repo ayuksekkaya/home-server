@@ -8,6 +8,17 @@ networks:
     ipam:
       config:
         - subnet: 192.168.91.0/24
+  t3_proxy:
+    name: t3_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+secrets:
+  basic_auth_credentials:
+    file: $DOCKERDIR/secrets/basic_auth_credentials
+  cf_dns_api_token:
+    file: $DOCKERDIR/secrets/cf_dns_api_token
 
 include:
   ########################### SERVICES
@@ -25,5 +36,7 @@ include:
   - compose/$HOSTNAME/sonarr.yml
   - compose/$HOSTNAME/duckdns.yml
   - compose/$HOSTNAME/wg-easy.yml
+  - compose/$HOSTNAME/jellyfin.yml
+  - compose/$HOSTNAME/ddclient.yml
 
 
