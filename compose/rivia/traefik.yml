@@ -15,7 +15,7 @@ services:
       - --global.sendAnonymousUsage=true
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
-      - --entrypoints.traefik.address=:8080
+      # - --entrypoints.traefik.address=:8080
       # - --entrypoints.ping.address=:8081
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
@@ -29,7 +29,7 @@ services:
       - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
       - --log=true
       - --log.filePath=/logs/traefik.log
-      - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.level=DEBUG # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       - --accessLog=true
       - --accessLog.filePath=/logs/access.log
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
@@ -49,7 +49,7 @@ services:
       - --entrypoints.websecure.http.tls.domains[0].sans=*.$DOMAINNAME_1
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory
       - --providers.file.watch=true # Only works on top level files in the rules folder
-      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
+      # - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
@@ -82,10 +82,6 @@ services:
         published: 443
         protocol: tcp
         mode: host
-      # - target: 8080 # need to enable --api.insecure=true
-      #   published: 8080
-      #   protocol: tcp
-      #   mode: host
     volumes:
       - $DOCKERDIR/appdata/traefik3/rules/$HOSTNAME:/rules # Dynamic File Provider directory
       # - /var/run/docker.sock:/var/run/docker.sock:ro # Enable if not using Socket Proxy
@@ -113,6 +109,6 @@ services:
       #- "traefik.http.routers.ping.service=ping@internal"
       # Middlewares
       # - "traefik.http.routers.traefik-rtr.middlewares=chain-no-auth@file" # For No Authentication
-      #- "traefik.http.routers.traefik-rtr.middlewares=chain-basic-auth@file" # For Basic HTTP Authentication
-      - "traefik.http.routers.traefik-rtr.middlewares=chain-oauth@file" # For Google OAuth
+      - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file" # For Basic HTTP Authentication
+      #- "traefik.http.routers.traefik-rtr.middlewares=chain-oauth@file" # For Google OAuth
       #- "traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file" # For Authelia Authentication

@@ -38,5 +38,6 @@ include:
   - compose/$HOSTNAME/wg-easy.yml
   - compose/$HOSTNAME/jellyfin.yml
   - compose/$HOSTNAME/ddclient.yml
+  - compose/$HOSTNAME/traefik.yml
 
 

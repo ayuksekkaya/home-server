@@ -11,6 +11,7 @@ services:
       - default
     ports:
      - "3000:3000" 
+    env_file: $DOCKERDIR/.env
     volumes:
       - $DOCKERDIR/appdata/homepage:/app/config
     environment:
