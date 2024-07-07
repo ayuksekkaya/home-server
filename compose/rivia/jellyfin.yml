@@ -4,6 +4,8 @@ services:
     container_name: jellyfin
     networks:
       - default
+      - socket_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     environment:
@@ -22,3 +24,13 @@ services:
       - '/dev/dri/renderD128:/dev/dri/renderD128'
       - '/dev/dri/card0:/dev/dri/card0'
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # HTTP Routers
+      - "traefik.http.routers.jellyfin-rtr.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME_1`)"
+      # Middlewares
+      - "traefik.http.routers.jellyfin-rtr.middlewares=chain-basic-auth@file"
+      # HTTP Services
+      - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
+      - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
