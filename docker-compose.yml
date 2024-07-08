@@ -19,6 +19,16 @@ secrets:
     file: $DOCKERDIR/secrets/basic_auth_credentials
   cf_dns_api_token:
     file: $DOCKERDIR/secrets/cf_dns_api_token
+  authelia_jwt_secret:
+    file: $DOCKERDIR/secrets/authelia_jwt_secret
+  authelia_session_secret:
+    file: $DOCKERDIR/secrets/authelia_session_secret
+  authelia_storage_encryption_key:
+    file: $DOCKERDIR/secrets/authelia_storage_encryption_key
+  mysql_root_password:
+    file: $DOCKERDIR/secrets/mysql_root_password
+  mysql_user_password:
+    file: $DOCKERDIR/secrets/mysql_user_password
 
 include:
   ########################### SERVICES
@@ -39,5 +49,6 @@ include:
   - compose/$HOSTNAME/jellyfin.yml
   - compose/$HOSTNAME/ddclient.yml
   - compose/$HOSTNAME/traefik.yml
-
+  - compose/$HOSTNAME/authelia.yml
+  - compose/$HOSTNAME/mariadb.yml
 
