@@ -51,4 +51,4 @@ include:
   - compose/$HOSTNAME/traefik.yml
   - compose/$HOSTNAME/authelia.yml
   - compose/$HOSTNAME/mariadb.yml
-
+  - compose/$HOSTNAME/crowdsec.yml

@@ -9,8 +9,6 @@ services:
     networks:
       - t3_proxy
       - default
-    # ports:
-    #   - "9091:9091"
     volumes:
       - $DOCKERDIR/appdata/authelia:/config
     environment:
@@ -20,13 +18,14 @@ services:
       - AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
       - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
       - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE=/run/secrets/authelia_storage_encryption_key
-      # - AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE=/run/secrets/authelia_storage_mysql_password
+      - AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE=/run/secrets/mysql_user_password
       # - AUTHELIA_SESSION_REDIS_PASSWORD_FILE=/run/secrets/authelia_session_redis_password
       # - AUTHELIA_DUO_API_SECRET_KEY_FILE=/run/secrets/authelia_duo_api_secret_key
     secrets:
       - authelia_jwt_secret
       - authelia_storage_encryption_key
       - authelia_session_secret
+      - mysql_user_password
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
